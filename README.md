@@ -593,9 +593,6 @@ docker-compose up --build --no-cache
 
 ---
 
-## 📄 License
-MIT
-
 ## 📧 Contact
 Umar Farooque - umarsk0209@gmail.com
 GitHub: https://github.com/umarsk0209
