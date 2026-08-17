@@ -25,9 +25,10 @@ services:
         generateValue: true
 
   # ---- React frontend (static site) ----
-  - type: staticSite
+  - type: web
     name: taskflow-frontend
     runtime: static
+    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
