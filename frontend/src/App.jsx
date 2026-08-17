@@ -6,12 +6,17 @@ import TaskPage from './pages/TaskPage';
 // 1. Read Vite env or fallback directly to your Render backend URL
 let rawApiUrl = import.meta.env.VITE_API_URL || 'https://taskflow-api-nudj.onrender.com';
 
-// 2. Ensure the URL starts with http:// or https://
+// 2. Fix Render internal hostnames missing the domain suffix
+if (rawApiUrl && !rawApiUrl.includes('.') && !rawApiUrl.includes('localhost')) {
+  rawApiUrl = `${rawApiUrl}.onrender.com`;
+}
+
+// 3. Ensure the URL starts with http:// or https://
 if (!rawApiUrl.startsWith('http://') && !rawApiUrl.startsWith('https://')) {
   rawApiUrl = `https://${rawApiUrl}`;
 }
 
-// 3. Remove trailing slashes and ensure /api is appended
+// 4. Remove trailing slashes and ensure /api is appended
 const apiOrigin = rawApiUrl.replace(/\/+$/, '');
 export const API_BASE_URL = apiOrigin.endsWith('/api') ? apiOrigin : `${apiOrigin}/api`;
 
