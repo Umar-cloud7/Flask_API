@@ -1,0 +1,39 @@
+# Render Blueprint — deploys Postgres + Flask API + React frontend in one click.
+# Create a new Blueprint in the Render dashboard pointing at this repo's GitHub remote.
+
+databases:
+  - name: taskflow-db
+    plan: free
+    databaseName: taskdb
+
+services:
+  # ---- Flask REST API ----
+  - type: web
+    name: taskflow-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taskflow-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  # ---- React frontend (static site) ----
+  - type: staticSite
+    name: taskflow-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: taskflow-api
+          type: web
+          property: url
