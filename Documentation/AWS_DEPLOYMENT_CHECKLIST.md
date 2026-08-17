@@ -91,7 +91,7 @@
 DB_INSTANCE=task-api-db-prod
 DB_MASTER_USER=postgres
 DB_PASSWORD=$(openssl rand -hex 16)  # Store this securely
-SECURITY_GROUP_ID=sg-xxxxxxxx
+SECURITY_GROUP_ID=sg-056e9da513f17b98c
 
 # Create RDS instance with security hardening
 aws rds create-db-instance \
@@ -111,7 +111,7 @@ aws rds create-db-instance \
   --enable-iam-database-authentication \
   --multi-az \
   --deletion-protection \
-  --enable-http-endpoint
+
 
 # Wait for DB to be available (5-10 minutes)
 aws rds wait db-instance-available --db-instance-identifier $DB_INSTANCE
@@ -128,12 +128,12 @@ aws rds describe-db-instances \
 ```bash
 # Variables
 KEY_NAME=my-flask-key
-SECURITY_GROUP_ID=sg-api-xxxxxxxx
-SUBNET_ID=subnet-xxxxxxxx
+SECURITY_GROUP_ID=sg-06b5b51f9fafe7c16
+SUBNET_ID=subnet-0176dcb3677538409
 
 # Launch EC2 instance
 INSTANCE_ID=$(aws ec2 run-instances \
-  --image-id ami-0c55b159cbfafe1f0 \
+  --image-id ami-01a00762f46d584a1 \
   --instance-type t3.micro \
   --key-name $KEY_NAME \
   --security-group-ids $SECURITY_GROUP_ID \
@@ -174,12 +174,13 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo apt install git -y
 
 # Clone repository
-git clone https://github.com/your-username/flask_api_project.git
-cd flask_api_project
+git clone https://github.com/Umar-cloud7/Flask_API.git
+cd Flask_API
 
 # Create .env file with RDS credentials
-cat > .env << 'EOF'
-DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@$RDS_ENDPOINT:5432/taskdb
+# Create .env file with unexpanded variables for Docker, and evaluate JWT secret immediately
+cat > .env << EOF
+DATABASE_URL=postgresql://\$DB_USER:\$DB_PASSWORD@\$RDS_ENDPOINT:5432/taskdb
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 FLASK_ENV=production
 EOF
