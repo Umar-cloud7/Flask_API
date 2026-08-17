@@ -3,14 +3,17 @@ import axios from 'axios';
 import AuthPage from './pages/AuthPage';
 import TaskPage from './pages/TaskPage';
 
-// VITE_API_URL is the API origin (e.g. https://taskflow-api.onrender.com);
-// the API lives under /api, so append it. Falls back to the same-origin
-// /api path (Vite dev proxy / nginx) when unset.
-const rawApiUrl = import.meta.env.VITE_API_URL;
-const apiOrigin = rawApiUrl ? rawApiUrl.replace(/\/+$/, '') : '';
-export const API_BASE_URL = apiOrigin
-  ? apiOrigin.endsWith('/api') ? apiOrigin : `${apiOrigin}/api`
-  : '/api';
+// 1. Read Vite env or fallback directly to your Render backend URL
+let rawApiUrl = import.meta.env.VITE_API_URL || 'https://taskflow-api-nudj.onrender.com';
+
+// 2. Ensure the URL starts with http:// or https://
+if (!rawApiUrl.startsWith('http://') && !rawApiUrl.startsWith('https://')) {
+  rawApiUrl = `https://${rawApiUrl}`;
+}
+
+// 3. Remove trailing slashes and ensure /api is appended
+const apiOrigin = rawApiUrl.replace(/\/+$/, '');
+export const API_BASE_URL = apiOrigin.endsWith('/api') ? apiOrigin : `${apiOrigin}/api`;
 
 // Interceptor: injects Bearer token directly on every request
 axios.interceptors.request.use(
