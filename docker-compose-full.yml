@@ -1,5 +1,4 @@
 services:
-  # PostgreSQL Database
   db:
     image: postgres:15-alpine
     container_name: task-db
@@ -9,8 +8,6 @@ services:
       POSTGRES_DB: taskdb
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     networks:
       - task-network
     healthcheck:
@@ -21,24 +18,32 @@ services:
       start_period: 15s
     restart: unless-stopped
 
-  # Flask API
   api:
-    command: gunicorn -w 1 -b 0.0.0.0:5000 app:app
-    build: .
+    command: gunicorn -w 2 --threads 4 --worker-class gthread --timeout 60 --keep-alive 5 -b 0.0.0.0:5000 app:app
+    build: ./backend
     container_name: task-api
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/taskdb
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-prod}
-      FLASK_ENV: development
+      PORT: 5000
     ports:
       - "5000:5000"
-    volumes:
-      - .:/app
     networks:
       - task-network
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+    container_name: task-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - task-network
+    depends_on:
+      - api
     restart: unless-stopped
 
 volumes:
