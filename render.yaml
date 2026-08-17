@@ -1,5 +1,4 @@
 # Render Blueprint — deploys Postgres + Flask API + React frontend in one click.
-# Create a new Blueprint in the Render dashboard pointing at this repo's GitHub remote.
 
 databases:
   - name: taskflow-db
@@ -24,7 +23,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
 
-  # ---- React frontend (static site) ----
+  # ---- React Frontend (Static Site) ----
   - type: web
     name: taskflow-frontend
     runtime: static
@@ -37,4 +36,4 @@ services:
         fromService:
           name: taskflow-api
           type: web
-          property: url
+          property: host
